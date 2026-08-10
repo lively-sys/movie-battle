@@ -1,6 +1,6 @@
 #List of functions used to get data from the OscarBase API
 
-#Gets the number of unique nominations for a movie given its TMDB ID
+#Gets the number of unique oscar nominations and wins for a movie given its TMDB ID
 def get_nominations(tmdb_id):
     import requests
 
@@ -11,6 +11,9 @@ def get_nominations(tmdb_id):
         "tmdb_id": tmdb_id
     }
     response = requests.get(url_a, params=params)
+
+    if response.json()['pagination']['total'] == 0:
+        return {"noms": 0, "wins": 0}
 
     url_b=f"https://api.oscarbase.com/api/movies/{response.json()['data'][0]['id']}"
 
@@ -28,8 +31,4 @@ def get_nominations(tmdb_id):
         if nomination["winner"]
     ]
 
-    output = {
-        "noms": len(unique_nominations),
-        "wins": len(unique_winners)
-    }
-    return output
+    return {"noms": len(unique_nominations), "wins": len(unique_winners)}
